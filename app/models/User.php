@@ -25,37 +25,44 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 *
 	 * @return mixed
 	 */
+	protected $fillable = array('id_collaborator', 'full_name', 'username', 'email', 'password');
 
 	use HasRole;
 
+	public $errors;
 
-	public static $rules = array(
-			'id_collaborator' => 'required|numeric|unique:users,id_collaborator',
-      'full_name' => 'required|min:3',
-      'username' => 'required',
-      'email' => 'required|email|unique:users,email,id',
-      'password' => 'required'
-    );
-
-	public static $messages = array(
-			'id_collaborator.required' => 'El número del colaborador es obligatorio',
-			'id_collaborator.numeric' => 'El Id del colaborador debe contener sólo números',
-			'id_collaborator.unique' => 'El número del colaborador que acabas de ingresar ya le pertenece a otro usuario',
-	    'full_name.required' => 'El nombre es obligatorio.',
-	    'full_name.min' => 'El nombre debe contener al menos tres caracteres.',
-	    'username.required' => 'El nombre de usuario es obligatorio.',
-	    'email.required' => 'El email es obligatorio.',
-	    'email.email' => 'El email debe contener un formato válido.',
-	    'email.unique' => 'El email que acabas de ingresar ya le pertenece a otro usuario.',
-	    'password.required' => 'La contraseña es obligatoria.',
-	);
-	
-	public static function validate($data, $id=null){
-	     $reglas = self::$rules;
-	     $reglas['email'] = str_replace('id', $id, self::$rules['email']);
-	     $messages = self::$messages;
-	     return Validator::make($data, $reglas, $messages);
-	}
+	public function isValid($data)
+    {
+        $rules = array(
+        	'id_collaborator' => 'required|unique:users',
+            'full_name' => 'required|min:4|max:40',
+            'username' => 'required|unique:users|min:4|max:15',
+            'email'     => 'required|email|unique:users,email',
+            'password'  => 'required|min:8|confirmed',
+        );
+         // Si el usuario existe:
+        if ($this->exists)
+        {
+            //Evitamos que la regla “unique” tome en cuenta el email del usuario actual
+			$rules['email'] .= ',' . $this->id;
+        }
+        else // Si no existe...
+        {
+            // La clave es obligatoria:
+            $rules['password'] .= '|required';
+        }
+        
+        $validator = Validator::make($data, $rules);
+        
+        if ($validator->passes())
+        {
+            return true;
+        }
+        
+        $this->errors = $validator->errors();
+        
+        return false;
+    }
 
 	public function getAuthIdentifier()
 	{

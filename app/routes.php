@@ -11,7 +11,13 @@
 |
 */
 
-Route::resource('admin/users', 'Admin_UsersControllers');
+Route::resource('admin/users', 'Admin_UsersController');
+
+
+Route::get('layouts/template/{name}', function ($name) {
+   $name = ucwords(str_replace('-', ' ', $name));
+   return View::make('template')->with('name', $name); 
+});
 
 //form login
 Route::get('/', array('before' => 'guest', function()
