@@ -12,6 +12,7 @@
 */
 
 Route::resource('admin/users', 'Admin_UsersController');
+Route::resource('posts', 'PostsController');
 
 
 Route::get('layouts/template/{name}', function ($name) {

@@ -34,7 +34,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	public function isValid($data)
     {
         $rules = array(
-        	'id_collaborator' => 'required|unique:users',
             'full_name' => 'required|min:4|max:40',
             'username' => 'required|unique:users|min:4|max:15',
             'email'     => 'required|email|unique:users,email',

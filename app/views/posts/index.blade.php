@@ -1,0 +1,1 @@
+/var/www/Radec_apps/app/views/posts/index.blade.php
